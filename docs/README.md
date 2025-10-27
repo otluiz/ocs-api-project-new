@@ -7,6 +7,7 @@
 Este projeto implementa um protótipo completo e funcional de uma API de gestão de dados para o OCS Inventory, utilizando um stack moderno, performático e de fácil deployment. A solução foi desenhada para ser um substituto direto e simplificado do servidor OCS tradicional.
 
 ## 1. Arquitetura do Stack
+<img width="1536" height="1024" alt="ChatGPT Image 27 de out  de 2025, 16_50_47" src="https://github.com/user-attachments/assets/9c5cadb9-5c55-4d0d-aa04-ac822d845b6e" />
 
 O projeto é orquestrado via Docker Compose e consiste nos seguintes serviços:
 
