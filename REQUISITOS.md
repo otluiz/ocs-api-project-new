@@ -1,14 +1,16 @@
 # 📋 Requisitos Mínimos do Sistema
 
-**Projeto**: OCS Inventory API  
-**Versão**: 1.0.0  
-**Data**: 22 de Outubro de 2025
+# Requisitos do Sistema - OCS API Project
+
+**Autor:** Othon Teixeira  
+**Data:** 26 de Outubro de 2025  
+**Versão:** 1.1.1  
 
 ---
 
 ## 🖥️ Requisitos de Hardware
 
-### Servidor (VM Ubuntu 22.04)
+### Servidor (VM Ubuntu 22.04 ou superior)
 
 | Componente | Mínimo | Recomendado | Produção |
 |:---|:---:|:---:|:---:|

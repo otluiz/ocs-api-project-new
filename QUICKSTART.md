@@ -1,6 +1,10 @@
 # 🚀 Guia Rápido de Início - OCS Inventory API
 
-## Cenário: VirtualBox/VMware com Ubuntu 22.04
+**Autor:** Othon Teixeira  
+**Data:** 26 de Outubro de 2025  
+**Versão:** 1.1.1  
+
+## Cenário: VirtualBox/VMware com Ubuntu 22.04 ou superior
 
 ### 📋 Pré-requisitos
 

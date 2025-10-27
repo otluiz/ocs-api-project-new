@@ -1,5 +1,17 @@
 # OCS Inventory API - Protótipo Completo
 
+# OCS API Project
+
+**Autor:** Othon Teixeira  
+**Data da última atualização:** 26 de Outubro de 2025  
+**Versão:** 1.1.1  
+
+---
+
+Este projeto implementa uma API e pipeline de ingestão de dados para integração com OCS Inventory, com visualização via Metabase.
+
+
+
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
@@ -209,10 +221,9 @@ Este projeto é fornecido como está, para fins educacionais e de demonstração
 
 ## 👤 Autor
 
-**Manus AI**
-Data: 22 de Outubro de 2025
+**Othon Teixeira**
+Data: 26 de Outubro de 2025
 
----
 
 **⭐ Se este projeto foi útil, considere dar uma estrela!**
 

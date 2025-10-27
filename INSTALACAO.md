@@ -1,7 +1,12 @@
 # 📦 Guia de Instalação - OCS Inventory API
 
-**Versão**: 1.0.0  
-**Data**: 22 de Outubro de 2025
+# Instalação - OCS API Project
+
+**Autor:** Othon Teixeira  
+**Data:** 26 de Outubro de 2025  
+**Versão:** 1.1.1  
+
+---
 
 Este guia fornece instruções detalhadas para instalação do sistema OCS Inventory API em diferentes cenários.
 
