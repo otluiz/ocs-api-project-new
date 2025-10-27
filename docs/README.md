@@ -1,7 +1,8 @@
 # OCS Inventory API - Protótipo Completo
 
-**Autor**: Manus AI
+**Autor**: Othon Teixeira
 **Data**: 22 de Outubro de 2025
+**Versão**:1.0.0
 
 Este projeto implementa um protótipo completo e funcional de uma API de gestão de dados para o OCS Inventory, utilizando um stack moderno, performático e de fácil deployment. A solução foi desenhada para ser um substituto direto e simplificado do servidor OCS tradicional.
 
@@ -13,7 +14,7 @@ O projeto é orquestrado via Docker Compose e consiste nos seguintes serviços:
 - **Banco de Dados**: Um banco de dados **PostgreSQL**, escolhido por sua robustez, performance com dados complexos e suporte nativo a JSONB.
 - **BI & Frontend**: Uma instância do **Metabase**, uma poderosa ferramenta de Business Intelligence open-source que se conecta diretamente ao banco de dados e permite a criação de dashboards e relatórios interativos sem a necessidade de código.
 
-![Arquitetura da Solução](https://i.imgur.com/your-architecture-diagram.png)  <!-- Placeholder for a diagram -->
+![Arquitetura da Solução](https://imgur.com/a/L6uEYOH)  <!-- Placeholder for a diagram -->
 
 ## 2. Funcionalidades
 
