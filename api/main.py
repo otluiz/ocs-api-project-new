@@ -66,15 +66,22 @@ async def health_check(db: Session = Depends(get_db)):
         timestamp=datetime.now()
     )
 
-
+#------------< início da função >------------------------------------        
 def parse_ocs_xml(xml_content: str) -> dict:
     """
     Parseia XML do agente OCS e converte para dicionário Python
     """
+    def safe_int(value, default=0):
+        try:
+            if value is None:
+                return default
+            return int(float(value))
+        except Exception:
+            return default
+
     try:
         root = ET.fromstring(xml_content)
-        
-        # Extrair informações principais
+
         device_data = {
             "device_id": None,
             "hostname": None,
@@ -94,7 +101,8 @@ def parse_ocs_xml(xml_content: str) -> dict:
             "network_interfaces": [],
             "logged_users": []
         }
-        
+
+#------------< início da correção >------------------------------------        
         # HARDWARE section
         hardware = root.find(".//HARDWARE")
         if hardware is not None:
@@ -108,18 +116,20 @@ def parse_ocs_xml(xml_content: str) -> dict:
             device_data["model"] = hardware.findtext("SMODEL") or hardware.findtext("MODEL")
             device_data["serial_number"] = hardware.findtext("SSN")
             device_data["cpu_name"] = hardware.findtext("PROCESSORT")
-            device_data["cpu_cores"] = int(hardware.findtext("PROCESSORN", 0))
-            device_data["ram_mb"] = int(hardware.findtext("MEMORY", 0))
-        
+            device_data["cpu_cores"] = safe_int(hardware.findtext("PROCESSORN"))
+            device_data["ram_mb"] = safe_int(hardware.findtext("MEMORY"))
+
         # STORAGES section
         for storage in root.findall(".//STORAGES"):
             device_data["storage"].append({
                 "disk_name": storage.findtext("NAME", ""),
                 "disk_type": storage.findtext("TYPE", ""),
-                "capacity_gb": int(int(storage.findtext("DISKSIZE", 0)) / 1024) if storage.findtext("DISKSIZE") else 0,
+                # DISKSIZE costuma vir em MB (às vezes float). Convertemos para GB:
+                "capacity_gb": int(float(storage.findtext("DISKSIZE", "0")) / 1024),
                 "serial_number": storage.findtext("SERIALNUMBER", "")
             })
-        
+
+#------------< fim da correção >------------------------------------        
         # NETWORKS section
         for network in root.findall(".//NETWORKS"):
             device_data["network_interfaces"].append({
@@ -148,8 +158,9 @@ def parse_ocs_xml(xml_content: str) -> dict:
                 "domain": user.findtext("DOMAIN", "")
             })
         
+        # (demais seções permanecem como estavam)
         return device_data
-        
+
     except ET.ParseError as e:
         logger.error(f"Erro ao parsear XML: {e}")
         raise HTTPException(status_code=400, detail=f"Invalid XML: {str(e)}")
@@ -157,6 +168,7 @@ def parse_ocs_xml(xml_content: str) -> dict:
         logger.error(f"Erro inesperado ao processar XML: {e}")
         raise HTTPException(status_code=500, detail=f"Error processing XML: {str(e)}")
 
+#------------< fim da função >------------------------------------        
 
 def store_inventory(data: dict, db: Session) -> str:
     """
@@ -218,6 +230,11 @@ def store_inventory(data: dict, db: Session) -> str:
         )
         for sw in data.get("software", []):
             if sw.get("name"):
+                install_date = sw.get("install_date")
+                # Trata datas vazias ou inválidas
+                if not install_date or install_date.strip() in ("", "0000-00-00", "N/A"):
+                    install_date = None
+
                 db.execute(
                     text("""
                         INSERT INTO software (device_id, name, version, publisher, install_date)
@@ -226,9 +243,13 @@ def store_inventory(data: dict, db: Session) -> str:
                     """),
                     {
                         "device_id": data["device_id"],
-                        **sw
+                        "name": sw.get("name"),
+                        "version": sw.get("version"),
+                        "publisher": sw.get("publisher"),
+                        "install_date": install_date
                     }
                 )
+
         
         # 4. Limpar e inserir storage
         db.execute(
@@ -301,34 +322,56 @@ def store_inventory(data: dict, db: Session) -> str:
         logger.error(f"Erro ao armazenar inventário: {e}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-
+#----------< início da correção >----------------------------
 @app.post("/ocsinventory", tags=["OCS Agent"])
 async def ocs_inventory_endpoint(request: Request, db: Session = Depends(get_db)):
     """
     Endpoint compatível com agente OCS Inventory oficial
-    Aceita XML no formato OCS e retorna resposta XML
+    Aceita XML no formato OCS (compactado ou não) e retorna resposta XML
     """
     try:
         # Ler corpo da requisição
         body = await request.body()
-        content_type = request.headers.get("content-type", "")
-        
+        content_type = request.headers.get("content-type", "").lower()
+
         logger.info(f"Recebida requisição OCS - Content-Type: {content_type}")
-        
-        # Parsear XML
-        xml_content = body.decode("utf-8")
+
+        # --- 🧠 NOVO BLOCO: lidar com compressão do agente ---
+        import gzip, zlib
+
+        if "compress" in content_type:
+            try:
+                try:
+                    body = zlib.decompress(body)
+                    logger.info("XML descompactado com zlib")
+                except zlib.error:
+                    body = gzip.decompress(body)
+                    logger.info("XML descompactado com gzip")
+            except Exception as e:
+                logger.warning(f"Falha ao descompactar XML: {e}")
+
+        # Decode texto
+        xml_content = body.decode("utf-8", errors="ignore").strip()
+
+        # Se for um PROLOG básico (sem HARDWARE)
+        if "<QUERY>PROLOG" in xml_content and "<HARDWARE>" not in xml_content:
+            logger.info("Recebido PROLOG inicial — instruindo envio de inventário completo")
+            response_xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <REPLY>
+            <RESPONSE>SEND</RESPONSE>
+            <PROLOG_FREQ>24</PROLOG_FREQ>
+        </REPLY>"""
+            return Response(content=response_xml, media_type="application/xml")
+
+        # Caso normal: XML de inventário completo
         device_data = parse_ocs_xml(xml_content)
-        
-        # Armazenar no banco
         device_id = store_inventory(device_data, db)
-        
-        # Retornar resposta XML compatível com OCS
-        response_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<REPLY>
-    <RESPONSE>SEND</RESPONSE>
-    <PROLOG_FREQ>24</PROLOG_FREQ>
-</REPLY>"""
-        
+
+        # Retornar confirmação de recebimento do inventário
+        response_xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <REPLY><INVENTORY_RESPONSE>OK</INVENTORY_RESPONSE></REPLY>"""
+
+#-----------< fim da correção >-----------------------        
         return Response(content=response_xml, media_type="application/xml")
         
     except Exception as e:
