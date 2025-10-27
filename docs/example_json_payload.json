@@ -1,0 +1,54 @@
+{
+  "device_id": "DESKTOP-ABC123-UUID",
+  "hostname": "DESKTOP-ABC123",
+  "ip_address": "192.168.1.100",
+  "mac_address": "00:11:22:33:44:55",
+  "os_name": "Microsoft Windows 10 Pro",
+  "os_version": "10.0.19045",
+  "os_architecture": "x86_64",
+  "manufacturer": "Dell Inc.",
+  "model": "OptiPlex 7090",
+  "serial_number": "ABC123XYZ",
+  "cpu_name": "Intel Core i7-10700 @ 2.90GHz",
+  "cpu_cores": 8,
+  "ram_mb": 16384,
+  "software": [
+    {
+      "name": "Google Chrome",
+      "version": "120.0.6099.109",
+      "publisher": "Google LLC",
+      "install_date": "2024-01-15"
+    },
+    {
+      "name": "Microsoft Office Professional Plus 2021",
+      "version": "16.0.14332.20481",
+      "publisher": "Microsoft Corporation",
+      "install_date": "2023-12-01"
+    }
+  ],
+  "storage": [
+    {
+      "disk_name": "C:",
+      "disk_type": "SSD",
+      "capacity_gb": 512,
+      "serial_number": "S4EVNX0R123456A"
+    }
+  ],
+  "network_interfaces": [
+    {
+      "interface_name": "Intel Ethernet Connection",
+      "mac_address": "00:11:22:33:44:55",
+      "ip_address": "192.168.1.100",
+      "netmask": "255.255.255.0",
+      "gateway": "192.168.1.1",
+      "dhcp_enabled": true,
+      "status": "up"
+    }
+  ],
+  "logged_users": [
+    {
+      "username": "john.doe",
+      "domain": "COMPANY"
+    }
+  ]
+}

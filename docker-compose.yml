@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: ocs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ocsinventory
+      POSTGRES_USER: ocsuser
+      POSTGRES_PASSWORD: ocspassword
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ocs-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocsuser -d ocsinventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API FastAPI
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ocs-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ocsuser:ocspassword@db:5432/ocsinventory
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ocs-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Metabase para BI e Dashboards
+  metabase:
+    image: metabase/metabase:latest
+    container_name: ocs-metabase
+    restart: unless-stopped
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: ocsuser
+      MB_DB_PASS: ocspassword
+      MB_DB_HOST: db
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ocs-network
+    volumes:
+      - metabase_data:/metabase-data
+
+networks:
+  ocs-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  metabase_data:
+    driver: local
+
