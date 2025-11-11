@@ -1,28 +1,28 @@
 version: '3.8'
 
 services:
-  # Banco de Dados PostgreSQL
-  db:
-    image: postgres:15-alpine
-    container_name: ocs-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ocsinventory
-      POSTGRES_USER: ocsuser
-      POSTGRES_PASSWORD: ocspassword
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-    ports:
-      - "5432:5432"
-    networks:
-      - ocs-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ocsuser -d ocsinventory"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # Banco de Dados PostgreSQL comentado por estar em conflito com uma base "db"
+#  db:
+#    image: postgres:15-alpine
+#    container_name: ocs-postgres
+#    restart: unless-stopped
+#    environment:
+#      POSTGRES_DB: ocsinventory
+#      POSTGRES_USER: ocsuser
+#      POSTGRES_PASSWORD: ocspassword
+#      PGDATA: /var/lib/postgresql/data/pgdata
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - ocs-network
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U ocsuser -d ocsinventory"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
   # API FastAPI
   api:
@@ -32,14 +32,11 @@ services:
     container_name: ocs-api
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://ocsuser:ocspassword@db:5432/ocsinventory
+      DATABASE_URL: postgresql://ocsuser:ocspassword@ocs-postgres:5432/ocsinventory
     ports:
       - "8000:8000"
     volumes:
       - ./api:/app
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - ocs-network
     healthcheck:
@@ -59,12 +56,9 @@ services:
       MB_DB_PORT: 5432
       MB_DB_USER: ocsuser
       MB_DB_PASS: ocspassword
-      MB_DB_HOST: db
+      MB_DB_HOST: ocs-postgres
     ports:
       - "3000:3000"
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - ocs-network
     volumes:
@@ -79,4 +73,3 @@ volumes:
     driver: local
   metabase_data:
     driver: local
-
