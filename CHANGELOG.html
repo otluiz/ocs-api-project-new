@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>CHANGELOG.html</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head>
+
+<body>
+
+<h1>📜 Changelog</h1>
+
+<h2>[1.1.2] - 2025-11-11</h2>
+
+<h3>Adicionado</h3>
+
+<ul>
+<li>Suporte completo a PostgreSQL (schema.sql)</li>
+<li>Nova imagem <code>api/Dockerfile</code> com <code>main:app</code></li>
+<li>Arquivo <code>inventario_teste.xml</code> para validação local</li>
+<li>Arquitetura atualizada (<code>ocs-arquitetura.png</code>)</li>
+</ul>
+
+<h3>Corrigido</h3>
+
+<ul>
+<li>Erro de <code>ModuleNotFoundError: No module named 'api'</code></li>
+<li>Conflito de container <code>db</code> removido (renomeado para <code>ocs-postgres</code>)</li>
+<li>Docker Compose ajustado com rede <code>ocs-api-project_ocs-network</code></li>
+</ul>
+
+<h3>Melhorias</h3>
+
+<ul>
+<li>Healthcheck no Postgres</li>
+<li>Compatibilidade com Metabase</li>
+<li>Simplificação da configuração (<code>DATABASE_URL</code>)</li>
+</ul>
+
+<h2>[1.1.1] - 2025-10-27</h2>
+
+<h3>Adicionado</h3>
+
+<ul>
+<li>Inclusão de autoria (Othon Teixeira) em todos os arquivos de documentação</li>
+<li>Adicionado arquivo <code>LICENSE</code> (GPL v3.0)</li>
+<li>Atualizado <code>REQUISITOS.md</code> para “Ubuntu 22.04 Server ou superior”</li>
+<li>Revisão e padronização das datas de versão 1.1.1</li>
+</ul>
+
+<h2>[1.1.0] - 2025-10-26</h2>
+
+<h3>Alterações principais</h3>
+
+<ul>
+<li>Correção de erros na inicialização dos containers (<code>setup-server.sh</code>, <code>setup-api.sh</code>, <code>setup-metabase.sh</code>)</li>
+<li>Ajuste no <code>docker-compose.yml</code> para compatibilidade com PostgreSQL 16</li>
+<li>Melhoria de logs e validação no script <code>check-requirements.sh</code></li>
+<li>Refatoração das variáveis de ambiente e suporte à instalação automatizada</li>
+<li>Documentação revisada: <code>INSTALACAO.md</code>, <code>QUICKSTART.md</code> e <code>REQUISITOS.md</code></li>
+</ul>
+
+<h3>Ambiente validado</h3>
+
+<ul>
+<li>Host: <code>quantumSystem</code></li>
+<li>Local de instalação: <code>/home/otluiz/ocs-api</code></li>
+<li>Status: ✅ Testado e rodando sem erros</li>
+</ul>
+
+</body>
+</html>

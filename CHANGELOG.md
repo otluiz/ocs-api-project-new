@@ -1,5 +1,23 @@
 # 📜 Changelog
 
+## [1.1.2] - 2025-11-11
+### Adicionado
+- Suporte completo a PostgreSQL (schema.sql)
+- Nova imagem `api/Dockerfile` com `main:app`
+- Arquivo `inventario_teste.xml` para validação local
+- Arquitetura atualizada (`ocs-arquitetura.png`)
+
+### Corrigido
+- Erro de `ModuleNotFoundError: No module named 'api'`
+- Conflito de container `db` removido (renomeado para `ocs-postgres`)
+- Docker Compose ajustado com rede `ocs-api-project_ocs-network`
+
+### Melhorias
+- Healthcheck no Postgres
+- Compatibilidade com Metabase
+- Simplificação da configuração (`DATABASE_URL`)
+
+
 ## [1.1.1] - 2025-10-27
 ### Adicionado
 - Inclusão de autoria (Othon Teixeira) em todos os arquivos de documentação
@@ -18,5 +36,5 @@
 
 ### Ambiente validado
 - Host: `quantumSystem`
-- Local de instalação: `/opt/ocs-api`
+- Local de instalação: `/home/otluiz/ocs-api`
 - Status: ✅ Testado e rodando sem erros

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>README.html</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head>
+
+<body>
+
+<h1>OCS Inventory API - Protótipo Completo</h1>
+
+<h1>OCS API Project</h1>
+
+<p><strong>Autor:</strong> Othon Teixeira <br />
+<strong>Data da última atualização:</strong> 26 de Outubro de 2025 <br />
+<strong>Versão:</strong> 1.1.2  </p>
+
+<hr />
+
+<p>Este projeto implementa uma API e pipeline de ingestão de dados para integração com OCS Inventory, com visualização via Metabase.</p>
+
+<p><a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11-blue.svg" alt="Python" title="" /></a>
+<a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.115-green.svg" alt="FastAPI" title="" /></a>
+<a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-15-blue.svg" alt="PostgreSQL" title="" /></a>
+<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Compose-blue.svg" alt="Docker" title="" /></a></p>
+
+<p>API moderna e performática para gestão de dados do OCS Inventory, compatível com agentes OCS oficiais.</p>
+
+<h2>🎯 Visão Geral</h2>
+
+<p>Este projeto implementa uma <strong>API REST de ingestão de dados</strong> para o OCS Inventory, substituindo o servidor tradicional por uma solução mais simples, escalável e fácil de manter. A arquitetura utiliza:</p>
+
+<ul>
+<li><strong>FastAPI</strong> (Python) - Backend assíncrono de alta performance</li>
+<li><strong>PostgreSQL</strong> - Banco de dados relacional com suporte JSONB</li>
+<li><strong>Metabase</strong> - Business Intelligence e dashboards</li>
+<li><strong>Docker Compose</strong> - Orquestração simplificada</li>
+</ul>
+
+<h2>✨ Características</h2>
+
+<ul>
+<li>✅ <strong>Compatível com agentes OCS oficiais</strong> (Windows, Linux, macOS)</li>
+<li>✅ <strong>API REST JSON</strong> para consultas e integrações</li>
+<li>✅ <strong>Deployment em 1 comando</strong> via script automatizado</li>
+<li>✅ <strong>Dashboards interativos</strong> com Metabase</li>
+<li>✅ <strong>Schema de banco inspirado no OCS original</strong></li>
+<li>✅ <strong>Documentação automática</strong> (Swagger/OpenAPI)</li>
+</ul>
+
+<h2>📁 Estrutura do Projeto</h2>
+
+<p><code>
+ocs-api-project/
+├── api/                    # API FastAPI
+│   ├── main.py            # Endpoints e lógica principal
+│   ├── models.py          # Modelos Pydantic
+│   ├── database.py        # Conexão com PostgreSQL
+│   ├── Dockerfile         # Container da API
+│   └── requirements.txt   # Dependências Python
+├── database/
+│   └── schema.sql         # Schema do banco de dados
+├── client/
+│   └── test_client.py     # Cliente de teste Python
+├── scripts/
+│   └── setup-server.sh    # Script de instalação Ubuntu 22.04
+├── docs/                  # Documentação completa
+├── docker-compose.yml     # Orquestração dos serviços
+├── README.md              # Este arquivo
+└── QUICKSTART.md          # Guia rápido de início
+</code></p>
+
+<h2>🚀 Início Rápido</h2>
+
+<h3>Pré-requisitos</h3>
+
+<ul>
+<li>Ubuntu 22.04 Server (VM ou bare metal)</li>
+<li>Acesso root/sudo</li>
+<li>Conexão com a internet</li>
+</ul>
+
+<h3>Instalação (3 passos)</h3>
+
+<ol>
+<li><p><strong>Copie o projeto para a VM</strong>:
+```bash</p>
+
+<h1>Via SCP, Git ou pasta compartilhada</h1>
+
+<p>scp -r ocs-api-project/ usuario@servidor:/home/usuario/
+```</p></li>
+<li><p><strong>Execute o script de instalação</strong>:
+<code>bash
+cd ocs-api-project
+chmod +x scripts/setup-server.sh
+sudo ./scripts/setup-server.sh
+</code></p></li>
+<li><p><strong>Acesse os serviços</strong>:</p>
+
+<ul>
+<li>API: <code>http://[IP_SERVIDOR]:8000/docs</code></li>
+<li>Metabase: <code>http://[IP_SERVIDOR]:3000</code></li>
+</ul></li>
+</ol>
+
+<p><strong>Leia o <a href="QUICKSTART.md">QUICKSTART.md</a> para instruções detalhadas.</strong></p>
+
+<h2>📊 Endpoints da API</h2>
+
+<h3>Ingestão de Dados</h3>
+
+<ul>
+<li><code>POST /ocsinventory</code> - Endpoint compatível com agente OCS (XML)</li>
+<li><code>POST /api/ingest</code> - Endpoint alternativo (JSON)</li>
+</ul>
+
+<h3>Consultas</h3>
+
+<ul>
+<li><code>GET /api/devices</code> - Lista todos os dispositivos</li>
+<li><code>GET /api/devices/{device_id}</code> - Detalhes de um dispositivo</li>
+<li><code>GET /health</code> - Status da API e banco de dados</li>
+</ul>
+
+<p><strong>Documentação completa</strong>: <code>http://[IP_SERVIDOR]:8000/docs</code></p>
+
+<h2>🧪 Testando</h2>
+
+<h3>Opção 1: Cliente de Teste Python</h3>
+
+<p><code>bash
+cd client
+python3 test_client.py http://[IP_SERVIDOR]:8000
+</code></p>
+
+<h3>Opção 2: Agente OCS Oficial</h3>
+
+<p><strong>Windows</strong>:
+<code>powershell
+cd "C:\Program Files\OCS Inventory Agent"
+.\OCSInventory.exe /force /server=http://[IP_SERVIDOR]:8000/ocsinventory
+</code></p>
+
+<p><strong>Linux</strong>:
+<code>bash
+sudo ocsinventory-agent --server http://[IP_SERVIDOR]:8000/ocsinventory
+</code></p>
+
+<h2>📈 Schema do Banco de Dados</h2>
+
+<p>O banco de dados possui as seguintes tabelas principais:</p>
+
+<ul>
+<li><code>raw_inventory</code> - Payload JSON completo (auditoria)</li>
+<li><code>devices</code> - Informações normalizadas dos dispositivos</li>
+<li><code>software</code> - Software instalado</li>
+<li><code>hardware_storage</code> - Discos e armazenamento</li>
+<li><code>network_interfaces</code> - Interfaces de rede</li>
+<li><code>logged_users</code> - Usuários logados</li>
+</ul>
+
+<p><strong>View agregada</strong>: <code>v_devices_summary</code> para relatórios consolidados.</p>
+
+<h2>🔧 Gerenciamento</h2>
+
+<h3>Ver logs:</h3>
+
+<p><code>bash
+cd /opt/ocs-api
+docker-compose logs -f api
+</code></p>
+
+<h3>Parar/Iniciar:</h3>
+
+<p><code>bash
+docker-compose stop
+docker-compose start
+</code></p>
+
+<h3>Backup do banco:</h3>
+
+<p><code>bash
+docker exec ocs-postgres pg_dump -U ocsuser ocsinventory &gt; backup.sql
+</code></p>
+
+<h2>📖 Documentação Completa</h2>
+
+<ul>
+<li><a href="docs/README.md">README Detalhado</a></li>
+<li><a href="QUICKSTART.md">Guia Rápido</a></li>
+<li><a href="docs/ocs_rest_api.md">API REST do OCS</a></li>
+<li><a href="docs/ocs_xml_format.md">Formato XML do OCS</a></li>
+</ul>
+
+<h2>🏗️ Arquitetura</h2>
+
+<p><code>
+┌─────────────────┐
+│  Agente OCS     │ (Windows/Linux/macOS)
+│  (Cliente)      │
+└────────┬────────┘
+         │ POST XML
+         │ http://servidor:8000/ocsinventory
+         ▼
+┌─────────────────────────────────┐
+│   Docker Compose (Servidor)     │
+│  ┌──────────────────────────┐   │
+│  │   API FastAPI (8000)     │   │
+│  │  - Recebe XML/JSON       │   │
+│  │  - Valida dados          │   │
+│  │  - Armazena no banco     │   │
+│  └──────────┬───────────────┘   │
+│             │                    │
+│             ▼                    │
+│  ┌──────────────────────────┐   │
+│  │  PostgreSQL (5432)       │   │
+│  │  - Armazena inventário   │   │
+│  │  - JSONB + tabelas       │   │
+│  └──────────┬───────────────┘   │
+│             │                    │
+│             ▼                    │
+│  ┌──────────────────────────┐   │
+│  │  Metabase (3000)         │   │
+│  │  - Dashboards            │   │
+│  │  - Relatórios            │   │
+│  └──────────────────────────┘   │
+└─────────────────────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Navegador Web  │ (Visualização)
+└─────────────────┘
+</code></p>
+
+<h2>🤝 Contribuindo</h2>
+
+<p>Este é um protótipo desenvolvido para demonstração. Sugestões de melhorias:</p>
+
+<ul>
+<li>[ ] Autenticação JWT para a API</li>
+<li>[ ] Rate limiting</li>
+<li>[ ] Suporte a múltiplos tenants</li>
+<li>[ ] Webhooks para notificações</li>
+<li>[ ] Exportação de relatórios em PDF</li>
+<li>[ ] Interface web administrativa</li>
+</ul>
+
+<h2>📄 Licença</h2>
+
+<p>Este projeto é fornecido como está, para fins educacionais e de demonstração.</p>
+
+<h2>👤 Autor</h2>
+
+<p><strong>Othon Teixeira</strong>
+Data: 26 de Outubro de 2025</p>
+
+<p><strong>⭐ Se este projeto foi útil, considere dar uma estrela!</strong></p>
+
+</body>
+</html>

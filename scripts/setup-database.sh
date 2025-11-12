@@ -85,7 +85,7 @@ else
     print_warn "Schema não foi aplicado automaticamente. Aplicando manualmente..."
     
     if [ -f "database/schema.sql" ]; then
-        docker compose exec -T db psql -U ocsuser -d ocsinventory < database/schema.sql
+        docker compose exec -T ocs-postgres psql -U ocsuser -d ocsinventory < database/schema.sql
         print_info "✓ Schema aplicado manualmente"
     else
         print_error "Arquivo database/schema.sql não encontrado!"
@@ -99,7 +99,12 @@ docker compose exec -T db psql -U ocsuser -d ocsinventory -c \
     "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;" | \
     grep -v "^-" | grep -v "row" | grep -v "^$" | sed 's/^/  • /'
 
-# 5. Verificar dados de exemplo
+# 5. Criar o banco de dados para o Metabase
+print_info "Criando banco de dados 'metabase' para o Metabase..."
+docker compose exec -T ocs-postgres psql -U ocsuser -d postgres -c "CREATE DATABASE metabase OWNER ocsuser;" 2>/dev/null || echo '[INFO] Banco metabase já existe'
+
+
+# 6. Verificar dados de exemplo
 print_info "Verificando dados de exemplo..."
 DEVICE_COUNT=$(docker compose exec -T db psql -U ocsuser -d ocsinventory -t -c \
     "SELECT COUNT(*) FROM devices;" | tr -d ' ')

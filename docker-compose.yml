@@ -2,27 +2,27 @@ version: '3.8'
 
 services:
   # Banco de Dados PostgreSQL comentado por estar em conflito com uma base "db"
-#  db:
-#    image: postgres:15-alpine
-#    container_name: ocs-postgres
-#    restart: unless-stopped
-#    environment:
-#      POSTGRES_DB: ocsinventory
-#      POSTGRES_USER: ocsuser
-#      POSTGRES_PASSWORD: ocspassword
-#      PGDATA: /var/lib/postgresql/data/pgdata
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - ocs-network
-#    healthcheck:
-#      test: ["CMD-SHELL", "pg_isready -U ocsuser -d ocsinventory"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+  db:
+    image: postgres:15-alpine
+    container_name: ocs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ocsinventory
+      POSTGRES_USER: ocsuser
+      POSTGRES_PASSWORD: ocspassword
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ocs-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocsuser -d ocsinventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # API FastAPI
   api:
