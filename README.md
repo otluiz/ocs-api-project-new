@@ -4,7 +4,7 @@
 
 **Autor:** Othon Teixeira  
 **Data da última atualização:** 26 de Outubro de 2025  
-**Versão:** 1.1.1  
+**Versão:** 1.1.2  
 
 ---
 
