@@ -3,7 +3,7 @@
 # OCS API Project
 
 **Autor:** Othon Teixeira  
-**Data da última atualização:** 11 de Outubro de 2025  
+**Data da última atualização:** 11 de Novembro de 2025  
 **Versão:** 1.1.3  
 
 ---
