@@ -1,5 +1,20 @@
 # 📜 Changelog
 
+## [1.1.3] - 2025-11-12
+### Adicionado
+- Bloco unificado de detecção e instalação automática do Docker Compose (v1 e v2)
+- Variável `$DOCKER_COMPOSE` padronizada em todos os scripts (`setup-server.sh`, `setup-database.sh`, `setup-metabase.sh`)
+- Compatibilidade total com Ubuntu 22.04+ e Docker Compose Plugin moderno
+
+### Corrigido
+- Fluxo de instalação não encerra mais quando Docker Compose não está instalado
+- Scripts agora funcionam em ambientes sem Compose pré-instalado
+
+### Melhorias
+- Logs e mensagens padronizados em todos os scripts
+- Atualização incremental da infraestrutura de setup (pré-instalação automatizada)
+
+
 ## [1.1.2] - 2025-11-11
 ### Adicionado
 - Suporte completo a PostgreSQL (schema.sql)

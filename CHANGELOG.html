@@ -14,6 +14,30 @@
 
 <h1>📜 Changelog</h1>
 
+<h2>[1.1.3] - 2025-11-12</h2>
+
+<h3>Adicionado</h3>
+
+<ul>
+<li>Bloco unificado de detecção e instalação automática do Docker Compose (v1 e v2)</li>
+<li>Variável <code>$DOCKER_COMPOSE</code> padronizada em todos os scripts (<code>setup-server.sh</code>, <code>setup-database.sh</code>, <code>setup-metabase.sh</code>)</li>
+<li>Compatibilidade total com Ubuntu 22.04+ e Docker Compose Plugin moderno</li>
+</ul>
+
+<h3>Corrigido</h3>
+
+<ul>
+<li>Fluxo de instalação não encerra mais quando Docker Compose não está instalado</li>
+<li>Scripts agora funcionam em ambientes sem Compose pré-instalado</li>
+</ul>
+
+<h3>Melhorias</h3>
+
+<ul>
+<li>Logs e mensagens padronizados em todos os scripts</li>
+<li>Atualização incremental da infraestrutura de setup (pré-instalação automatizada)</li>
+</ul>
+
 <h2>[1.1.2] - 2025-11-11</h2>
 
 <h3>Adicionado</h3>

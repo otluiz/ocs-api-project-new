@@ -24,6 +24,34 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# =========================================
+#  Detectar ou instalar Docker Compose (padrão unificado)
+# =========================================
+
+# Verifica se o Docker Compose (v2 plugin ou v1 standalone) está presente
+if docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+    echo "[INFO] Usando Docker Compose v2 (plugin integrado)"
+elif docker-compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker-compose"
+    echo "[INFO] Usando Docker Compose v1 (binário standalone)"
+else
+    echo "[WARN] Docker Compose não encontrado — instalando automaticamente..."
+    apt-get update -y
+    apt-get install -y docker-compose-plugin
+    if docker compose version >/dev/null 2>&1; then
+        DOCKER_COMPOSE="docker compose"
+        echo "[INFO] Docker Compose v2 instalado com sucesso"
+    else
+        echo "[WARN] Falha ao instalar o plugin oficial, tentando fallback standalone..."
+        curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        DOCKER_COMPOSE="docker-compose"
+        echo "[INFO] Docker Compose (standalone) instalado como fallback"
+    fi
+fi
+
+
 echo "========================================="
 echo "  Configuração do Metabase (BI)"
 echo "========================================="
@@ -44,7 +72,7 @@ if [ ! -f "docker-compose.yml" ]; then
 fi
 
 # Verificar se PostgreSQL está rodando
-if ! docker compose ps db | grep -q "Up"; then
+if ! $DOCKER_COMPOSE ps db | grep -q "Up"; then
     print_error "Container PostgreSQL não está rodando!"
     print_info "Execute primeiro: sudo ./scripts/setup-database.sh"
     exit 1
@@ -53,7 +81,7 @@ fi
 # 1. Iniciar container do Metabase
 print_info "Iniciando container Metabase..."
 print_warn "ATENÇÃO: O Metabase pode levar 2-3 minutos para inicializar completamente"
-docker compose up -d metabase
+$DOCKER_COMPOSE up -d metabase
 
 # 2. Aguardar Metabase ficar pronto
 print_info "Aguardando Metabase inicializar (isso pode demorar)..."
@@ -85,7 +113,7 @@ echo ""
 if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
     print_error "Metabase não ficou pronto após $MAX_ATTEMPTS segundos"
     print_info "Verificando logs..."
-    docker compose logs --tail=50 metabase
+    $DOCKER_COMPOSE logs --tail=50 metabase
     print_warn "O Metabase pode estar ainda inicializando. Aguarde mais alguns minutos."
     exit 1
 fi
@@ -145,12 +173,15 @@ echo ""
 echo "Comandos úteis:"
 echo "  • Ver logs:"
 echo "    docker compose logs -f metabase"
+echo "ou (em sistemas mais antigos): docker-compose logs -f metabase"
 echo ""
 echo "  • Reiniciar Metabase:"
 echo "    docker compose restart metabase"
+echo "ou (em sistemas mais antigos): docker-compose restart metabase"
 echo ""
 echo "  • Acessar dados do Metabase:"
 echo "    docker compose exec metabase ls -la /metabase-data"
+echo "ou (em sistemas mais antigos): docker-compose exec metabase ls -la /metabase-data"
 echo ""
 print_info "Configuração do Metabase concluída!"
 print_warn "Acesse http://$SERVER_IP:3000 para completar a configuração inicial"

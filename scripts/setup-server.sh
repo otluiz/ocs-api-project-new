@@ -45,6 +45,34 @@ print_info "Atualizando sistema..."
 apt-get update -qq
 apt-get upgrade -y -qq
 
+# =========================================
+#  Detectar ou instalar Docker Compose (padrão unificado)
+# =========================================
+
+# Verifica se o Docker Compose (v2 plugin ou v1 standalone) está presente
+if docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+    echo "[INFO] Usando Docker Compose v2 (plugin integrado)"
+elif docker-compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker-compose"
+    echo "[INFO] Usando Docker Compose v1 (binário standalone)"
+else
+    echo "[WARN] Docker Compose não encontrado — instalando automaticamente..."
+    apt-get update -y
+    apt-get install -y docker-compose-plugin
+    if docker compose version >/dev/null 2>&1; then
+        DOCKER_COMPOSE="docker compose"
+        echo "[INFO] Docker Compose v2 instalado com sucesso"
+    else
+        echo "[WARN] Falha ao instalar o plugin oficial, tentando fallback standalone..."
+        curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        DOCKER_COMPOSE="docker-compose"
+        echo "[INFO] Docker Compose (standalone) instalado como fallback"
+    fi
+fi
+
+
 # 2. Instalar Docker
 if ! command -v docker &> /dev/null; then
     print_info "Instalando Docker..."
@@ -70,15 +98,25 @@ else
     print_info "✓ Docker já está instalado"
 fi
 
-# 3. Instalar Docker Compose (standalone)
-if ! command -v docker-compose &> /dev/null; then
-    print_info "Instalando Docker Compose..."
-    curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
-    print_info "✓ Docker Compose instalado"
+# 3. Instalar Docker Compose (plugin oficial ou fallback)
+if $DOCKER_COMPOSE version >/dev/null 2>&1; then
+    print_info "✓ Docker Compose v2 (plugin oficial) já está instalado"
+elif command -v $DOCKER_COMPOSE >/dev/null 2>&1; then
+    print_warn "Docker Compose (standalone v1) detectado — considere atualizar para o plugin v2"
 else
-    print_info "✓ Docker Compose já está instalado"
+    print_info "Instalando Docker Compose Plugin (v2)..."
+    apt-get update -y
+    apt-get install -y docker-compose-plugin
+    if $DOCKER_COMPOSE version >/dev/null 2>&1; then
+        print_info "✓ Docker Compose Plugin (v2) instalado com sucesso"
+    else
+        print_warn "Falha ao instalar o plugin oficial, tentando versão standalone..."
+        curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        print_info "✓ Docker Compose (standalone) instalado como fallback"
+    fi
 fi
+
 
 # 4. Instalar utilitários
 print_info "Instalando utilitários..."
@@ -134,8 +172,8 @@ print_info "✓ Arquivo .env criado"
 # 10. Iniciar serviços
 print_info "Iniciando serviços Docker..."
 cd "$PROJECT_DIR"
-docker-compose down 2>/dev/null || true
-docker-compose up -d
+$DOCKER_COMPOSE down 2>/dev/null || true
+$DOCKER_COMPOSE up -d
 
 # Aguardar serviços ficarem prontos
 print_info "Aguardando serviços iniciarem..."
@@ -143,7 +181,7 @@ sleep 10
 
 # Verificar status
 print_info "Verificando status dos serviços..."
-docker-compose ps
+$DOCKER_COMPOSE ps
 
 echo ""
 echo "========================================="

@@ -17,8 +17,8 @@
 <h1>OCS API Project</h1>
 
 <p><strong>Autor:</strong> Othon Teixeira <br />
-<strong>Data da última atualização:</strong> 26 de Outubro de 2025 <br />
-<strong>Versão:</strong> 1.1.2  </p>
+<strong>Data da última atualização:</strong> 11 de Outubro de 2025 <br />
+<strong>Versão:</strong> 1.1.3  </p>
 
 <hr />
 
@@ -100,9 +100,24 @@ ocs-api-project/
 cd ocs-api-project
 chmod +x scripts/setup-server.sh
 sudo ./scripts/setup-server.sh
-</code></p></li>
-<li><p><strong>Acesse os serviços</strong>:</p>
+</code></p>
 
+<h3>🐋 Requisitos de Docker Compose</h3></li>
+</ol>
+
+<p>Os scripts agora detectam e instalam automaticamente o <strong>Docker Compose</strong>, <br />
+seja a versão <strong>v2 (plugin oficial)</strong> ou a <strong>v1 (standalone)</strong>.</p>
+
+<blockquote>
+  <p>Nenhuma ação manual é necessária — o instalador fará a detecção e instalação conforme o ambiente.
+✅ Testado em:
+- Ubuntu 22.04 LTS (Jammy Jellyfish)
+- Docker 24.x
+- Docker Compose v2.24.x e v1.29.x</p>
+</blockquote>
+
+<ol>
+<li><strong>Acesse os serviços</strong>:
 <ul>
 <li>API: <code>http://[IP_SERVIDOR]:8000/docs</code></li>
 <li>Metabase: <code>http://[IP_SERVIDOR]:3000</code></li>
