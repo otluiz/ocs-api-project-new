@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. Serviço de Banco de Dados PostgreSQL
+  # 1. Banco de Dados PostgreSQL 
   db:
     image: postgres:15-alpine
     container_name: ocs-postgres
@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # 2. Serviço de API FastAPI
+  # 2. API FastAPI
   api:
     build:
       context: ./api
@@ -39,9 +39,6 @@ services:
       - ./api:/app
     networks:
       - ocs-network
-    depends_on:
-      db:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -66,11 +63,7 @@ services:
       - ocs-network
     volumes:
       - metabase_data:/metabase-data
-    depends_on:
-      db:
-        condition: service_healthy
-
-  # 4. Serviço do Cliente (Frontend/Client) <-- AGORA
+  # 4. Cliente metabase adicionado para ingerir dados dos clientes
   client:
     build:
       context: ./client
@@ -85,8 +78,8 @@ services:
     networks:
       - ocs-network
     depends_on:
-      api:
-        condition: service_started # O frontend depende da API estar rodando
+      - api # O frontend depende da API
+
 
 networks:
   ocs-network:

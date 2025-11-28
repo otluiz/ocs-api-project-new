@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 
 # Configuração do servidor
-SERVER_URL = "http://localhost:8000"  # Altere para o IP do servidor
+SERVER_URL = "http://ocs-api:8000"  # Altere para o IP do servidor ou o serviço do docker
 
 
 def get_system_info():
