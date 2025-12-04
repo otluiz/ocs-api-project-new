@@ -1,4 +1,4 @@
-"""
+g"""
 API FastAPI para Ingestão de Dados OCS Inventory
 Compatível com agente OCS oficial (XML) e também aceita JSON
 """
@@ -339,55 +339,44 @@ async def ocs_inventory_endpoint(request: Request, db: Session = Depends(get_db)
         # --- 🧠 NOVO BLOCO: lidar com compressão do agente ---
         import gzip, zlib
 
+#        if "compress" in content_type:
+#            try:
+#                try:
+#                    body = zlib.decompress(body)
+#                    logger.info("XML descompactado com zlib")
+#                except zlib.error:
+#                    body = gzip.decompress(body)
+#                    logger.info("XML descompactado com gzip")
+#            except Exception as e:
+#                logger.warning(f"Falha ao descompactar XML: {e}")
         if "compress" in content_type:
-            original_body = body
-            # 1. Tenta descompactar com zlib (wbits=47) - para zlib e gzip com cabeçalhos
             try:
-                body = zlib.decompress(body, wbits=47)
-                logger.info("XML descompactado com zlib (wbits=47 - zlib/gzip auto)")
-            except zlib.error as zlib_err_47:
-                # 2. Tenta descompactar com zlib (wbits=15) - para zlib padrão
                 try:
-                    body = zlib.decompress(original_body, wbits=15)
-                    logger.info("XML descompactado com zlib (wbits=15 - zlib padrão)")
-                except zlib.error as zlib_err_15:
-                    # 3. Tenta descompactar com gzip (gzip.decompress)
-                    try:
-                        body = gzip.decompress(original_body)
-                        logger.info("XML descompactado com gzip (gzip.decompress)")
-                    except Exception as gzip_err:
-                        # 4. Se falhar, mantém o corpo original e loga o erro
-                        body = original_body
-                        logger.warning(f"Falha ao descompactar XML. Erro zlib(47): {zlib_err_47}. Erro zlib(15): {zlib_err_15}. Erro gzip: {gzip_err}. Processando como não compactado.")
+                    body = zlib.decompress(body)
+                    logger.info("XML descompactado com zlib")
+                except zlib.error:
+                    body = gzip.decompress(body)
+                    logger.info("XML descompactado com gzip")
+            except Exception as e:
+                logger.warning(f"Falha ao descompactar XML: {e}. Tentando processar como XML não compactado.")
+                # Se a descompressão falhar, o 'body' permanece o original (XML não compactado)
+                # e o processamento continua na linha 354.
+                # O erro 500 anterior era causado por um erro de lógica no tratamento da exceção.
+                # O bloco try/except deve ser ajustado para garantir que o 'body' não seja corrompido.
+                pass
 
         # Decode texto
+        logger.info(f"DEBUG: Primeiros 50 bytes do corpo: {body[:50]}")
         xml_content = body.decode("utf-8", errors="ignore").strip()
-
-        # Adiciona verificação de corpo vazio após descompressão/falha
-        if not xml_content:
-            logger.error("Corpo da requisição vazio após descompressão.")
-            raise HTTPException(status_code=400, detail="Empty request body after decompression attempt.")
-            
-        # Verificação adicional para o caso de o corpo ser muito pequeno (e provavelmente malformado)
-        # O erro "not well-formed (invalid token): line 1, column 2" sugere que o conteúdo é muito curto ou inválido.
-        # Se o corpo for muito curto, é provável que seja um erro de transmissão/compressão.
-        # Um XML OCS válido (mesmo o PROLOG) é maior que 10 caracteres.
-        if len(xml_content) < 10:
-            logger.error(f"Corpo da requisição muito curto ({len(xml_content)} caracteres). Conteúdo: {xml_content[:20]}")
-            # Se o log de falha na descompressão ocorreu, este é o erro esperado.
-            if "incomplete or truncated stream" in xml_content:
-                raise HTTPException(status_code=400, detail="Incomplete or truncated compressed stream received.")
-            else:
-                raise HTTPException(status_code=400, detail="Request body too short or malformed after decompression attempt.")
 
         # Se for um PROLOG básico (sem HARDWARE)
         if "<QUERY>PROLOG" in xml_content and "<HARDWARE>" not in xml_content:
             logger.info("Recebido PROLOG inicial — instruindo envio de inventário completo")
             response_xml = """<?xml version="1.0" encoding="UTF-8"?>
-	        <REPLY>
-	            <PROLOG_FREQ>1</PROLOG_FREQ>
-	            <INVENTORY>1</INVENTORY>
-	        </REPLY>"""
+        <REPLY>
+            <RESPONSE>SEND</RESPONSE>
+            <PROLOG_FREQ>24</PROLOG_FREQ>
+        </REPLY>"""
             return Response(content=response_xml, media_type="application/xml")
 
         # Caso normal: XML de inventário completo
@@ -408,18 +397,14 @@ async def ocs_inventory_endpoint(request: Request, db: Session = Depends(get_db)
     <RESPONSE>ERROR</RESPONSE>
     <ERROR>{str(e)}</ERROR>
 </REPLY>"""
-        # Se o erro for uma HTTPException (como a 400 de XML inválido), usa o status code dela
-        if isinstance(e, HTTPException):
-            status_code = e.status_code
-        else:
-            status_code = 500
-            
-        return Response(content=error_xml, media_type="application/xml", status_code=status_code)
+        return Response(content=error_xml, media_type="application/xml", status_code=500)
 
 
 @app.post("/api/ingest", response_model=IngestResponse, tags=["API"])
 async def ingest_json(payload: InventoryPayload, db: Session = Depends(get_db)):
-    # Endpoint alternativo que aceita JSON (para testes e integrações customizadas)
+    """
+    Endpoint alternativo que aceita JSON (para testes e integrações customizadas)
+    """
     try:
         data = payload.model_dump()
         device_id = store_inventory(data, db)
